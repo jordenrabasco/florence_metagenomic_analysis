@@ -5,7 +5,16 @@ This document is intented as an analysis summary and sample workflow from which 
 
 ## Setup
 
-Set up the work folders and directories needed in the downstream analysis. The installation of all of the required tools is also included in this section. The analysis was run on the bioinformatics cluster, and the only tool not already installed on the cluster was metabat2 used for binning purposes. 
+Set up the work folders and directories needed in the downstream analysis. The installation of all of the required tools is also included in this section. The analysis was run on the bioinformatics cluster, and utlizes the tools and programs;
+
+1) Fastqc
+2) Trimmomatic
+3) Samtools
+4) Bowtie
+5) Kaiju
+6) Megahit
+7) Quasit
+8) Metabat2
 
 ```shell
 # change root directory to the folder which will house all of your other analysis folder
@@ -41,7 +50,6 @@ Set up the work folders and directories needed in the downstream analysis. The i
     #	conda install -c bioconda metabat2
     #	conda install -c bioconda/label/cf201901 metabat2
 ```
-Once everything is setup we can start with the analysis
 
 ## FastQC and trimming
 
