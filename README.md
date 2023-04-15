@@ -1,20 +1,22 @@
 # florence_metagenomic_analysis
 In the analysis documented below we analyzed shotgun sequencing data sampled from various locations before and after the landfall of hurricane florence. The sequencing data was quality controlled and taxonomically anlyzed to detect taxonomic shifts in the local estuary produced by Florence's landfall and the subsequence ecological perturbation that followed. A detailed summary of the goals of this analysis can be found in the included Plan of Work document. 
 
-This document is intented as an analysis summary and sample workflow from which our procedure can be replicated. The aforementioned procedure is broken up into various steps seperated out in different bash scripts to emphasize each step in the process. 
+This document is intented as an analysis summary and sample workflow from which our procedure can be replicated. The aforementioned procedure is broken up into various steps seperated out in different bash scripts to emphasize each step in the process. The scripts are intended to be run sequentially in the order in which they are presented. 
 
 ## Setup
 
-Set up the work folders and directories needed in the downstream analysis. The installation of all of the required tools is also included in this section. The analysis was run on the bioinformatics cluster, and utlizes the tools and programs;
+This script sets up the work folders and directories needed in the downstream analysis. The installation of all of the required tools is also included in this section. The tools used in this analysis are included below;
 
-1) Fastqc
-2) Trimmomatic
-3) Samtools
-4) Bowtie
-5) Kaiju
-6) Megahit
-7) Quasit
-8) Metabat2
+1) Fastqc - Read quality; https://anaconda.org/bioconda/fastqc
+2) Trimmomatic - Read trimming; https://anaconda.org/bioconda/trimmomatic
+3) Samtools - File conversions and managment; https://anaconda.org/bioconda/samtools
+4) Bowtie - Sequence alignment and sequence analysis; https://anaconda.org/bioconda/bowtie
+5) Kaiju - taxonomic classification;https://anaconda.org/bioconda/kaiju
+6) Megahit - NGS de novo assembly; https://anaconda.org/bioconda/megahit
+7) Quasit - Quality Assessment for Genome Assemblies; https://anaconda.org/bioconda/quast
+8) Metabat2 - Binning and genome reconstruction; https://anaconda.org/bioconda/metabat2
+
+The tools listed above weree installed locally outside of a conda enviorment and that code is included in the document. For ease of reproduction our recommendation is to install the tools listed via a conda enviorment, instead of what is presented here. 
 
 ```shell
 # change root directory to the folder which will house all of your other analysis folder
@@ -38,8 +40,8 @@ Set up the work folders and directories needed in the downstream analysis. The i
 	bin_dir="bin"
 		
 # Make all subfolders described above in your local system; these lines are commented out to avoid overwritting folders in subsequent runs of the analysis   
-#	mkdir -p $out_root && cd $out_root
-#	mkdir -p $log_dir $logstrim_dir $merge_dir $trim_dir $filter_dir $clean_dir $pool_dir $qc_dir $qc2_dir $kdb_dir $pretaxa_dir $assem_dir $assem2_dir $bin_dir
+	mkdir -p $out_root && cd $out_root
+	mkdir -p $log_dir $logstrim_dir $merge_dir $trim_dir $filter_dir $clean_dir $pool_dir $qc_dir $qc2_dir $kdb_dir $pretaxa_dir $assem_dir $assem2_dir $bin_dir
 
 
 	################# INSTALLATION #################
@@ -47,20 +49,20 @@ Set up the work folders and directories needed in the downstream analysis. The i
 	cd ${tool_dir}
 
 	# metabat2
-    #	conda install -c bioconda metabat2
-    #	conda install -c bioconda/label/cf201901 metabat2
+    	conda install -c bioconda metabat2
+    	conda install -c bioconda/label/cf201901 metabat2
 ```
 
-## FastQC and trimming
+## FastQC,
 
-We will want to process all of the reads before and after trimming with fastqc to assess if the trimming works and maintainec the integrity of the data.
+Initally all reads were processed thorugh fastqc before trimming to assess if the trimming and intial decontamination works and has maintained the integrity of the data.
 
 FastQC Before Trimming
 ```shell
 # Output folder specified
 	qc_dir="${out_root}/QC"
 
-# Specify the fastqc location in your system 
+# Specify the fastqc location in your system if installed not through a conda enviorment
 	fastqc="/opt/fastqc/0.11.9/fastqc"
 
 # enter data folder for a specific data collection and get list of all files in folder
@@ -74,7 +76,7 @@ FastQC Before Trimming
 	    eval $cmd
 	done
 ```
-
+The fastqc 
 Trimming via trimmomatic
 ```shell
 # Output Directories
