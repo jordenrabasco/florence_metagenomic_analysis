@@ -16,10 +16,11 @@ This script sets up the work folders and directories needed in the downstream an
 7) Quast, 5.2.0 - Quality Assessment for Genome Assemblies
 8) Metabat2, 2.15 - Binning and genome reconstruction
 
+All programs used are included in the `tools` folder along with their accompanying databsed which is included here in `tar` format with the data. 
 
 ```shell
 # change root directory to the folder which will house all of your other analysis folder
-  root="/home4/sjeong6/Paerl" 
+  root="root_dir" 
 # change data directory to the folder which will house your data (you will just need to change "data" in this instance) 
   dat_root="${root}/data"
 # change out_root directory to the folder which will house your output files (you will just need to change "output2" in this instance)
@@ -44,15 +45,11 @@ This script sets up the work folders and directories needed in the downstream an
 
 
 	################# INSTALLATION #################
-	tool_dir="/home4/sjeong6/tools"
+	tool_dir="tools"
 	cd ${tool_dir}
-
-	# metabat2
-    	conda install -c bioconda metabat2
-    	conda install -c bioconda/label/cf201901 metabat2
 ```
 
-## FastQC,
+## Seqeuence QC
 
 Initally all reads were processed thorugh fastqc before trimming to assess if the trimming and intial decontamination works and has maintained the integrity of the data.
 
@@ -62,7 +59,7 @@ FastQC Before Trimming
 	qc_dir="${out_root}/QC"
 
 # Specify the fastqc location in your system if installed not through a conda enviorment
-	fastqc="/opt/fastqc/0.11.9/fastqc"
+	fastqc="/tools/fastqc/0.11.9/fastqc"
 
 # enter data folder for a specific data collection and get list of all files in folder
 	cd ${dat_root}/NVS139B_fastq
@@ -75,7 +72,7 @@ FastQC Before Trimming
 	    eval $cmd
 	done
 ```
-The fastqc 
+
 Trimming via trimmomatic
 ```shell
 # Output Directories
@@ -83,7 +80,7 @@ Trimming via trimmomatic
 	logstrim_dir="${out_root}/logs_trim"
 
 # Specify the trimmomatic location in your system 
-	trimmomatic="/opt/Trimmomatic/0.39/trimmomatic-0.39.jar"
+	trimmomatic="/tools/Trimmomatic/0.39/trimmomatic-0.39.jar"
 
 # enter data folder for a specific data collection and get list of all files in folder
 	cd ${dat_root}/NVS139B_fastq
@@ -117,19 +114,18 @@ Contaminant Analysis
 	mkdir -p $single_dir
 		
 # Tool
-	bowtie2="/opt/bowtie2/2.4.4/bowtie2"
-	bowtie2_build="/opt/bowtie2/2.4.4/bowtie2-build"
-	samtools="/opt/samtools/1.13/bin/samtools"
+	bowtie2="/tools/bowtie2/2.4.4/bowtie2"
+	bowtie2_build="/tools/bowtie2/2.4.4/bowtie2-build"
+	samtools="/tools/samtools/1.13/bin/samtools"
 	
 # 1) Download GRCh38 db
 	cd ${filter_dir}
-#	wget https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-#	unzip GRCh38_noalt_as.zip
+	wget https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+	unzip GRCh38_noalt_as.zip
 	
 	cd ${trim_dir}
        	r1s=(`ls | grep '_R1_trimmed.fastq.gz$'`)
 
-	#r1="BF10_S16_R1_trimmed.fastq.gz"
 	for r1 in ${r1s[@]}; do
 	    pre=`echo $r1 | sed 's/_R1_trimmed.fastq.gz//'`
 	    r2=`echo $r1 | sed 's/_R1_/_R2_/'`
@@ -166,3 +162,63 @@ Contaminant Analysis
 
 	done
 ```
+
+FastQC after trimming
+```shell
+
+        output="output"
+
+        # Inputs
+        root="root_dir"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+	clean_dir="${out_root}/clean_fastq"
+
+        # Outputs
+	qc2_dir="${out_root}/QC2"
+
+        # Tool
+	fastqc="/tools/fastqc/0.11.9/fastqc"
+
+	cd ${clean_dir}
+	fqs=(`ls | grep '.fastq.gz'`)
+	
+	# run fastqc
+	for fq in ${fqs[@]}; do
+	    cmd="$fastqc $fq -o ${qc2_dir}"
+	    echo $cmd
+	    eval $cmd
+	done
+
+```
+
+## Assembly
+
+```shell
+       output="output"
+
+        # Inputs
+        root="/home4/sjeong6/Paerl"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+
+        # Outputs
+	kdb_dir="${out_root}/kaiju_db"
+
+        # Tool
+	kaiju="/home4/sjeong6/tools/kaiju/bin/kaiju"
+	kaiju_makedb="/home4/sjeong6/tools/kaiju/bin/kaiju-makedb"
+
+	cd ${kdb_dir}
+	# refseq : Completely assembled and annotated reference genomes of Archaea, Bacteria, and viruses from the NCBI RefSeq database
+	${kaiju_makedb} -s refseq
+#	mv ./*.dmp ./refseq
+
+	# nr_euk : Subset of NCBI BLAST nr database containing all proteins belonging to Archaea, Bacteria and Viruses + proteins from fungi and microbial eukaryotes
+	${kaiju_makedb} -s nr_euk
+#	mv ./*.dmp ./nr_euk
+
+```
+
+
+
