@@ -7,16 +7,15 @@ This document is intented as an analysis summary and sample workflow from which 
 
 This script sets up the work folders and directories needed in the downstream analysis. The installation of all of the required tools is also included in this section. The tools used in this analysis are included below;
 
-1) Fastqc - Read quality; https://anaconda.org/bioconda/fastqc
-2) Trimmomatic - Read trimming; https://anaconda.org/bioconda/trimmomatic
-3) Samtools - File conversions and managment; https://anaconda.org/bioconda/samtools
-4) Bowtie - Sequence alignment and sequence analysis; https://anaconda.org/bioconda/bowtie
-5) Kaiju - taxonomic classification;https://anaconda.org/bioconda/kaiju
-6) Megahit - NGS de novo assembly; https://anaconda.org/bioconda/megahit
-7) Quasit - Quality Assessment for Genome Assemblies; https://anaconda.org/bioconda/quast
-8) Metabat2 - Binning and genome reconstruction; https://anaconda.org/bioconda/metabat2
+1) Fastqc, 0.11.9 - Read quality
+2) Trimmomatic, 0.39 - Read trimming
+3) Samtools, 1.13 - File conversions and managment
+4) Bowtie, 2.4.4 - Sequence alignment and sequence analysis 
+5) Kaiju, 1.9.2 - taxonomic classification
+6) Megahit, 1.2.9 - NGS de novo assembly 
+7) Quast, 5.2.0 - Quality Assessment for Genome Assemblies
+8) Metabat2, 2.15 - Binning and genome reconstruction
 
-The tools listed above weree installed locally outside of a conda enviorment and that code is included in the document. For ease of reproduction our recommendation is to install the tools listed via a conda enviorment, instead of what is presented here. 
 
 ```shell
 # change root directory to the folder which will house all of your other analysis folder
