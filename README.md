@@ -76,6 +76,11 @@ FastQC Before Trimming
 	done
 ```
 
+An example quailty score graph from the archetype sampel `BF3_S9` is included;
+
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/fastqc_example_before_trimming.png)
+
+As you can see there is a decreace in sequence quality torwards the end of the sequence, but overall the quality of the reads were good. 
 
 Trimmomatic was used to trim any residual Illumina specific sequences such as residual primers, seqeuncing bar codes, etc. found in the IlluminaClip sequence library. 
 
@@ -203,6 +208,11 @@ FastQC after trimming
 
 ```
 
+An example quailty score graph, the partner of the one included in the first step of the QC process BF3_S9, is included;
+
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/fastqc_example_after_trimming.png)
+
+As evident from the graph above the QC process removed the lower quality bases torwards the end of the read. 
 
 
 ## Assembly
