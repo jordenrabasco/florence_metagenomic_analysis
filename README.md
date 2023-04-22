@@ -1,4 +1,4 @@
-# florence_metagenomic_analysis
+# Florence_Metagenomic_Analysis
 In the analysis documented below we analyzed shotgun sequencing data sampled from various locations before and after the landfall of hurricane florence. The sequencing data was quality controlled and taxonomically anlyzed to detect taxonomic shifts in the local estuary produced by Florence's landfall and the subsequence ecological perturbation that followed. A detailed summary of the goals of this analysis can be found in the included Plan of Work document. 
 
 This document is intented as an analysis summary and sample workflow from which our procedure can be replicated. The aforementioned procedure is broken up into various steps seperated out in different bash scripts to emphasize each step in the process. The scripts are intended to be run sequentially in the order in which they are presented.
@@ -17,6 +17,7 @@ This script sets up the work folders and directories needed in the downstream an
 6) Megahit, 1.2.9 - NGS de novo assembly 
 7) Quast, 5.2.0 - Quality Assessment for Genome Assemblies
 8) Metabat2, 2.15 - Binning and genome reconstruction
+9) CheckM, 1.0.7 - Binning Quality Control
 
 All programs used are included in the `tools` folder along with their accompanying databsed which is included here in `tar` format with the data. 
 
@@ -53,7 +54,7 @@ All programs used are included in the `tools` folder along with their accompanyi
 
 ## Seqeuence QC
 
-Initally all reads were processed thorugh fastqc before trimming to assess if the trimming and intial decontamination works and has maintained the integrity of the data.
+Initally all reads were processed thorugh fastqc before trimming to assess if the trimming and intial decontamination maintained the integrity of the data.
 
 FastQC Before Trimming
 ```shell
@@ -74,6 +75,9 @@ FastQC Before Trimming
 	    eval $cmd
 	done
 ```
+
+
+Trimmomatic was used to trim any residual Illumina specific sequences such as residual primers, seqeuncing bar codes, etc. found in the IlluminaClip sequence library. 
 
 Trimming via trimmomatic
 ```shell
@@ -104,6 +108,9 @@ Trimming via trimmomatic
 	    eval $cmd
 	done
 ```
+
+
+Contamination reads, sourced from the human genome, were identified and removed utlizing the GRCh38_noalt_as database.
 
 Contaminant Analysis
 ```shell
@@ -165,6 +172,8 @@ Contaminant Analysis
 	done
 ```
 
+Post trimming and decontamination another FastQC round was run on each sample in order to assess if there has been any loss of data integrity thorughout the QC process.
+
 FastQC after trimming
 ```shell
 
@@ -193,6 +202,8 @@ FastQC after trimming
 	done
 
 ```
+
+
 
 ## Assembly
 
