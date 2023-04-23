@@ -54,7 +54,7 @@ All programs used are included in the `tools` folder along with their accompanyi
 
 ## Seqeuence QC
 
-Initally all reads were processed thorugh fastqc before trimming to assess if the trimming and intial decontamination maintained the integrity of the data.
+The Sequnce QC portion of the workflow utilized fastQC, trimmomatic, samtools, and bowtie2. This section is intended to trim, decontaminate, and seqeunce analyze the reads before subsequent data analysis. Initally all reads were processed thorugh fastqc before trimming to assess if the trimming and intial decontamination maintained the integrity of the data.
 
 FastQC Before Trimming
 ```shell
@@ -214,14 +214,15 @@ An example quailty score graph, the partner of the one included in the first ste
 
 As evident from the graph above the QC process removed the lower quality bases torwards the end of the read. 
 
+## Raw Read Taxonomic Assignment
 
-## Assembly
+This read taxonomic assignment utlizes Kaiju to match raw reads with sequences from a predownloaded database either refseq or nr_euk. 
+The first step in the workflow is to download and setup the local database. 
 
 ```shell
-       output="output"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -233,26 +234,22 @@ As evident from the graph above the QC process removed the lower quality bases t
 	kaiju_makedb="/home4/sjeong6/tools/kaiju/bin/kaiju-makedb"
 
 	cd ${kdb_dir}
-	# refseq : Completely assembled and annotated reference genomes of Archaea, Bacteria, and viruses from the NCBI RefSeq database
+	refseq : Completely assembled and annotated reference genomes of Archaea, Bacteria, and viruses from the NCBI RefSeq database
 	${kaiju_makedb} -s refseq
-#	mv ./*.dmp ./refseq
+	mv ./*.dmp ./refseq
 
-	# nr_euk : Subset of NCBI BLAST nr database containing all proteins belonging to Archaea, Bacteria and Viruses + proteins from fungi and microbial eukaryotes
+	nr_euk : Subset of NCBI BLAST nr database containing all proteins belonging to Archaea, Bacteria and Viruses + proteins from fungi and microbial eukaryotes
 	${kaiju_makedb} -s nr_euk
-#	mv ./*.dmp ./nr_euk
+	mv ./*.dmp ./nr_euk
 
 ```
 
-```shell
-###################################################################################
-#	Taxonomic assignment of reads using Kaiju
-#       DB :  refseq or nr_euk
-###################################################################################
+After setting up the local databases we then assigned the raw reads a taxonomy database.
 
-        output="output2"
+```shell
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -270,7 +267,6 @@ As evident from the graph above the QC process removed the lower quality bases t
         kaiju_makedb="/home4/sjeong6/tools/kaiju/bin/kaiju-makedb"
 	
 	cd ${clean_dir}
-#	r1s=(`ls | grep '_cont_removed_R1.fastq.gz$'`)
 	r1s="BF11_S17_cont_removed_R1.fastq.gz"
 	
 	# run Kaiju
@@ -290,15 +286,11 @@ As evident from the graph above the QC process removed the lower quality bases t
 
 ```
 
+The kaiju assignments were then systematically changed into table format and graphed through an imbeded R script. 
+
 ```shell
-###################################################################################
-#	Taxonomic assignment of reads using Kaiju
-###################################################################################
-
-        output="output2"
-
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -329,7 +321,6 @@ As evident from the graph above the QC process removed the lower quality bases t
 	# B. Specific level  => Create stacked bars using 2_1_5_taxa_summary.R
 
 	levels=("phylum", "class", "order", "family", "genus")   # "species" is the same with the above run for ALL taxa levels
-#	levels=("phylum")
 
 	for level in ${levels[@]}; do
 	    cmd="${kaiju2table} -t ${kdb_dir}/${db}/nodes.dmp -n ${kdb_dir}/${db}/names.dmp -r ${level} ${outs[*]} \
@@ -340,206 +331,10 @@ As evident from the graph above the QC process removed the lower quality bases t
 
 ```
 
-```shell
-###################################################################################
-#	Taxonomic assignment of reads using Kaiju
-###################################################################################
 
-        output="output2"
-
-        # Inputs
-        root="/home4/sjeong6/Paerl"
-        dat_root="${root}/data"
-        out_root="${root}/${output}"
-	clean_dir="${out_root}/clean_fastq"
-        kdb_dir="${out_root}/kaiju_db"
-
-	# Output
-	pretaxa_dir="${out_root}/pre_taxa"
-#	db="refseq"
-        db="nr_euk"
-
-	cd ${pretaxa_dir}/${db}
-	mkdir -p taxa_summary taxa_plot
-	
-        # Tool
-        kaiju="/home4/sjeong6/tools/kaiju/bin/kaiju"
-        kaiju_makedb="/home4/sjeong6/tools/kaiju/bin/kaiju-makedb"
-	kaiju2table="/home4/sjeong6/tools/kaiju/bin/kaiju2table"
-
-	cd ${pretaxa_dir}/${db}
-	outs=(`ls | grep '_pre_taxa.out'`)
-
-	# A. ALL taxa levels  => Create stacked bars using 2_1_4_taxa_summary.R
-	cmd="${kaiju2table} -t ${kdb_dir}/${db}/nodes.dmp -n ${kdb_dir}/${db}/names.dmp -r species ${outs[*]} \
-			    -o ${pretaxa_dir}/${db}/taxa_summary/kaiju_${db}_summary.tsv -l superkingdom,phylum,class,order,family,genus,species"
-	echo $cmd
-	eval $cmd
-	
-	# B. Specific level  => Create stacked bars using 2_1_5_taxa_summary.R
-
-	levels=("phylum", "class", "order", "family", "genus")   # "species" is the same with the above run for ALL taxa levels
-#	levels=("phylum")
-
-	for level in ${levels[@]}; do
-	    cmd="${kaiju2table} -t ${kdb_dir}/${db}/nodes.dmp -n ${kdb_dir}/${db}/names.dmp -r ${level} ${outs[*]} \
-	    			-o ${pretaxa_dir}/${db}/taxa_summary/kaiju_${db}_${level}_summary.tsv -l superkingdom,phylum,class,order,family,genus,species"
-	    echo $cmd
-	    eval $cmd
-	done
-
-```
+The script included below is the R script called in the bash script above. This script is designed to generate stacked bar charts of the raw read taxonomic assingments. 
 
 ```R
-###########################################################################################################
-#       Stacked bar chart to show taxanomic diversity of reads
-#       In the 2_1_3_kaiju_summary.sh, A. ALL taxa levels 
-###########################################################################################################
-
-#        install.packages("devtools")
-#        devtools::install_github("jaredhuling/jcolors")
-	
-	library(readr)
-	library(tidyverse)
-	library(ggplot2)
-#	library(jcolors)
-	library(RColorBrewer)
-	library(colorRamps)
-	
-	# I/O
-	output <- "output2"
-	root <- "/home4/sjeong6/Paerl"
-	dat_root <- file.path(root, "data")
-	out_root <- file.path(root, output)
-	pretaxa_dir <- file.path(out_root, "pre_taxa")
-
-	# !!! assign the DB you want to analyze
-#       db="refseq"
-	db="nr_euk"
-	pretaxa_dir <- file.path(pretaxa_dir, db) # update pretaxa_dir with db
-
-	taxasum_dir <- file.path(pretaxa_dir, "taxa_summary")
-	taxaplot_dir <- file.path(pretaxa_dir, "taxa_plot")
-
-        ##### Sample Info #####
-	# Import meta data
-	meta <- read.table(file.path(dat_root, "meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv"), sep=",", header=T)
-	colnames(meta) <- c("sampleID", "ng.uL", "ID", "NRE", "Date")
-
-        meta_grp <- meta %>% select("sampleID", "NRE", "Date")
-        meta_grp$NRE <- factor(meta_grp$NRE, levels=c("NRE30", "NRE70", "NRE100", "NRE180"))
-        meta_grp$Date <- as.Date(meta_grp$Date, "%m/%d/%Y") %>% factor(., ordered=T)
-
-	##### Taxonomic assignment from Kaiju #####
-	# Import the kaiju summary table
-	taxa_tab <- readr::read_tsv(file.path(taxasum_dir, paste0("kaiju_",db,"_summary.tsv"))) %>% as.data.frame
-
-	x <- taxa_tab
-	x$file <- gsub("_S.*$", "", x$file)
-	colnames(x) <- c("sampleID", "percent", "read_counts", "taxon_id", "taxon_name")
-
-	samp <- factor(x$sampleID)
-	y <- split(x, samp)
-
-	names(y) <- levels(samp)
-	y <- lapply(y, function(z) z %>% select(read_counts, taxon_id, taxon_name))
-
-	taxa_cnts <- merge(y[[1]], y[[2]], by=c("taxon_id","taxon_name"), all=T)
-        colnames(taxa_cnts)[(ncol(taxa_cnts)-1):ncol(taxa_cnts)] <- levels(samp)[1:2]
-        for (i in 3:length(y)) {
-            colnames(y[[i]])[1] <- levels(samp)[i]
-            taxa_cnts <- merge(taxa_cnts, y[[i]], by=c("taxon_id","taxon_name"), all=T)
-        }
-
-	levels <- c("domain", "phylum", "class", "order", "family", "genus", "species")
-	taxa <- matrix(NA, nrow(taxa_cnts), length(levels))
-
-	for (i in 1:nrow(taxa_cnts)) {
-	    x <- strsplit(taxa_cnts[i,"taxon_name"], ";")[[1]]
-	    if (length(x)==length(levels)) {
-	       taxa[i,] <- gsub(" ", "_", x)
-	    } else {
-	      taxa[i,] <- rep(gsub(" ", "_", taxa_cnts[i,"taxon_name"]), length(levels))
-	    }	    
-	}
-
-	colnames(taxa) <- levels
-	z <- taxa_cnts[,! colnames(taxa_cnts) %in% c("taxon_id", "taxon_name")]
-	z[is.na(z)] <- 0
-	taxa <- cbind(taxa, z)
-
-	filename <- paste0("taxa_reads_",db,".csv")
-	write.table(taxa, file.path(pretaxa_dir, filename), row.names = F, sep = ",", quote = F, col.names=T)
-
-	######################################## 
-        ##### Stack bar plots
-	########################################
-	# set level among ("domain", "phylum", "class", "order", "family", "genus", "species")
-	# set num as the number of taxa that shown in plots
-#	level="domain" ; num=5   # max=5
-#	level="phylum" ; num=15
-	level="class" ; num=15
-#	level="order" ; num=15
-#	level="family" ; num=15
-#	level="genus" ; num=20
-#	level="species" ; num=20
-
-	# Export the stacked bar plot
-	filename <- paste0(level, "_bar_", db, ".pdf")
-        pdf(file.path(taxaplot_dir, filename), width = 15, height = 6)
-	op <- par(mfrow=c(2,1), pty="s")
-
-        z <- taxa %>% group_by_at(all_of(level)) %>% summarize_at(names(.)[!names(.) %in% levels], sum) %>%
-        arrange(-rowMeans(.[, names(.) != level]))
-        z1 <- z[1:(num),]
-        z2 <- z[(num+1):nrow(z),-1] %>% colSums(.)
-        z2 <- c("others", z2)
-        zz <- rbind(z1, z2)
-        zz[, names(zz)[names(zz)!=level]] <- sapply(zz[, names(zz)[names(zz)!=level]], as.numeric)
-
-	# 1) Including "unclassified" and "cannot_be_assigned_to_a_(non−viral)_species"
-	rel_z <- zz %>% mutate_at(names(.)[names(.) != level], function(x) 100 * x / sum(x)) # The column sum per sample = 100
-	colnames(rel_z)[1] <- "taxa"
-		
-	rel_z %>% mutate_at("taxa", function(x) factor(x, levels = .[,"taxa"] %>% unlist %>% rev)) %>%
-	  	      pivot_longer(cols = names(.)[names(.) != "taxa"], names_to = "sampleID", values_to = "read") %>%
-	      	      left_join(meta_grp, by = "sampleID") %>% 
-	      	      arrange(taxa, Date, desc(read)) %>% mutate(sampleID = factor(sampleID, levels = .[.[,"taxa"] == "others", "sampleID"] %>% unlist %>% as.vector)) %>%
-	      	      ggplot(aes( x = sampleID, y = read, fill = taxa)) + geom_col(position = "stack") +
-	      			 facet_grid(.~NRE, space = "free", scales = "free") +
-				 ggtitle(paste0("Taxonomic distribution of reads at ", level, " level")) +
-				 xlab("Sample ID") + ylab("Proportion of reads (%)") + theme(legend.position = "right") +
-				 scale_y_continuous(limits = c(-1, 101), expand = c(0,0)) #+ theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
-	
-	# 2) Excluding "unclassified" and cannot_be_assigned_to_a_(non-viral)_species, NA
-	ww <- zz %>% as.data.frame
-	ww <- ww[!grepl('unclassified|cannot|NA', ww[,level]), ]
-
-	rel_w <- ww %>% mutate_at(names(.)[names(.) != level], function(x) 100 * x / sum(x)) # The column sum per sample = 100
-        colnames(rel_w)[1] <- "taxa"
-		
-        rel_w %>% mutate_at("taxa", function(x) factor(x, levels = .[,"taxa"] %>% unlist %>% rev)) %>%
-              	      pivot_longer(cols = names(.)[names(.) != "taxa"], names_to = "sampleID", values_to = "read") %>%
-              	      left_join(meta_grp, by = "sampleID") %>%
-              	      arrange(taxa, Date, desc(read)) %>% mutate(sampleID = factor(sampleID, levels = .[.[,"taxa"] == "others", "sampleID"] %>% unlist %>% as.vector)) %>%
-              	      ggplot(aes( x = sampleID, y = read, fill = taxa)) + geom_col(position = "stack") +
-                                 facet_grid(.~NRE, space = "free", scales = "free") +
-				 ggtitle(paste0("Taxonomic distribution of reads at ", level, " level_", "w/o NAs"))	+
-                                 xlab("Sample ID") + ylab("Proportion of reads (%)") + theme(legend.position = "right") +
-                                 scale_y_continuous(limits = c(-1, 101), expand = c(0,0)) #+ theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
-	
-	par(op)
-        dev.off()
-
-	# "NA"
-	show(taxa_cnts[grep(";NA;",taxa_cnts$taxon_name), ! colnames(taxa_cnts) %in% levels(samp)])
-	taxa_cnts[grep(";NA;",taxa_cnts$taxon_name), "taxon_name"] %>% length    
-```
-
-```R
-###########################################################################################################
-#       Stacked bar chart to show taxanomic diversity of reads
-###########################################################################################################
 
 #        install.packages("devtools")
 #        devtools::install_github("jaredhuling/jcolors")
@@ -684,30 +479,8 @@ As evident from the graph above the QC process removed the lower quality bases t
 
 ```
 
-```shell
-###################################################################################
-#	Build Kaiju DB
-###################################################################################
 
-        output="output2"
-
-        # Inputs
-        root="/home4/sjeong6/Paerl"
-        dat_root="${root}/data"
-        out_root="${root}/${output}"
-
-        # Outputs
-	ntdb_dir="${dat_root}/nt_db"
-	mkdir -p $ntdb_dir
-
-        # Tool
-	kraken2="/home4/sjeong6/tools/kraken2/kraken2"
-	kraken2_build="/home4/sjeong6/tools/kraken2/kraken2-build"
-	
-	cd ${ntdb_dir}
-	${kraken2_build} --download-library nt --db nt_db
-
-```
+## Assembly
 
 ```shell
 ###################################################################################
