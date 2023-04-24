@@ -26,7 +26,7 @@ This script sets up the work folders and directories needed in the downstream an
 #	set up folder structure
 ###################################################################################
 
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/output2"
 
@@ -42,13 +42,12 @@ This script sets up the work folders and directories needed in the downstream an
 	kdb_dir="kaiju_db"
 	pretaxa_dir="pre_taxa" # taxonomic assignment for reads 
 	assem_dir="assembly"   # using metahit
-#	assem2_dir="assembly2" # using metaSPAdes
 	bin_dir="bin"
 	binclass_dir="bin_class"
 	bintaxa_dir="bin_taxa"
 		
-#	mkdir -p $out_root && cd $out_root
-#	mkdir -p $log_dir $logstrim_dir $merge_dir $trim_dir $filter_dir $clean_dir $pool_dir $qc_dir $qc2_dir $kdb_dir $pretaxa_dir $assem_dir $assem2_dir $bin_dir $binclass_dir $bintaxa_dir
+	mkdir -p $out_root && cd $out_root
+	mkdir -p $log_dir $logstrim_dir $merge_dir $trim_dir $filter_dir $clean_dir $pool_dir $qc_dir $qc2_dir $kdb_dir $pretaxa_dir $assem_dir $assem2_dir $bin_dir $binclass_dir $bintaxa_dir
 
 
 	################# INSTALLATION #################
@@ -56,37 +55,32 @@ This script sets up the work folders and directories needed in the downstream an
 	cd ${tool_dir}
 
 	# metabat2
-#	conda install -c bioconda metabat2
-#	conda install -c bioconda/label/cf201901 metabat2
+	conda install -c bioconda metabat2
+	conda install -c bioconda/label/cf201901 metabat2
 
-	# spades
-#	wget http://cab.spbu.ru/files/release3.15.4/SPAdes-3.15.4-Linux.tar.gz
-#	tar -xzf SPAdes-3.15.4-Linux.tar.gz
-#	cd SPAdes-3.15.4-Linux/bin/
 
 	# for checkm
-#	conda create -n checkm python=2.7
-#	conda activate checkm
-#	conda install -c bioconda numpy matplotlib pysam
-#	conda install -c bioconda hmmer prodigal pplacer pysam
-	pip3 install checkm-genome
+	conda create -n checkm python=2.7
+	conda activate checkm
+	conda install -c bioconda numpy matplotlib pysam
+	conda install -c bioconda hmmer prodigal pplacer pysam
 
-	conda install -c bioconda checkm-genome
-#	mkdir -p ${tool_dir}/checkm_DB
-#	tar -xvzf checkm_data_2015_01_16.tar.gz -C "${tool_dir}/checkm_DB" --strip 1 > /dev/null
-#	checkm data setRoot "${tool_dir}/checkm_DB"
+
+	mkdir -p ${tool_dir}/checkm_DB
+	tar -xvzf checkm_data_2015_01_16.tar.gz -C "${tool_dir}/checkm_DB" --strip 1 > /dev/null
+	checkm data setRoot "${tool_dir}/checkm_DB"
 	export CHECKM_DATA_PATH=/home4/sjeong6/tools/checkm_DB
 	
 	# GTDB-Tk
-#        conda create -n gtdbtk-2.1.1 -c conda-forge -c bioconda gtdbtk=2.1.1
-#	conda activate gtdbtk-2.1.1
+        conda create -n gtdbtk-2.1.1 -c conda-forge -c bioconda gtdbtk=2.1.1
+	conda activate gtdbtk-2.1.1
 
 	cd $tool_dir
-#	wget https://data.gtdb.ecogenomic.org/releases/release207/207.0/auxillary_files/gtdbtk_r207_v2_data.tar.gz
-#	mkdir -p ${tool_dir}/gtdb_tk_DB
-#	tar -xvzf gtdbtk_r207_v2_data.tar.gz -C "/home4/sjeong6/tools/gtdb_tk_DB" --strip 1 > /dev/null
-#	rm gtdbtk_r207_v2_data.tar.gz
-#	conda env config vars set GTDBTK_DATA_PATH="/home4/sjeong6/tools/gtdb_tk_DB"
+	wget https://data.gtdb.ecogenomic.org/releases/release207/207.0/auxillary_files/gtdbtk_r207_v2_data.tar.gz
+	mkdir -p ${tool_dir}/gtdb_tk_DB
+	tar -xvzf gtdbtk_r207_v2_data.tar.gz -C "/home4/sjeong6/tools/gtdb_tk_DB" --strip 1 > /dev/null
+	rm gtdbtk_r207_v2_data.tar.gz
+	conda env config vars set GTDBTK_DATA_PATH="/home4/sjeong6/tools/gtdb_tk_DB"
 	
 	
 ```
@@ -104,7 +98,7 @@ FastQC Before Trimming
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -118,7 +112,6 @@ FastQC Before Trimming
 	fqs=(`ls | grep '.fastq.gz'`)
 
 	# run fastqc
-	#fq="BF10_S16_L001_R1_001.fastq.gz"
 	for fq in ${fqs[@]}; do
 	    cmd="$fastqc $fq -o ${qc_dir}"
 	    echo $cmd
@@ -143,7 +136,7 @@ Trimming via trimmomatic
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -158,7 +151,6 @@ Trimming via trimmomatic
 	r1s=(`ls | grep '_R1_001.fastq.gz$'`)
 
 	# run fastqc
-	#r1="BF10_S16_L001_R1_001.fastq.gz"
 	for r1 in ${r1s[@]}; do
 	    pre=`echo $r1 | sed 's/_L001_R1_001.fastq.gz//'`
 	    r2=`echo $r1 | sed 's/_R1_/_R2_/'`
@@ -191,7 +183,7 @@ Contaminant Analysis
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
         trim_dir="${out_root}/trim"
@@ -211,13 +203,12 @@ Contaminant Analysis
 	
 	# 1) Download GRCh38 db
 	cd ${filter_dir}
-#	wget https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-#	unzip GRCh38_noalt_as.zip
+	wget https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+	unzip GRCh38_noalt_as.zip
 	
 	cd ${trim_dir}
        	r1s=(`ls | grep '_R1_trimmed.fastq.gz$'`)
 
-	#r1="BF10_S16_R1_trimmed.fastq.gz"
 	for r1 in ${r1s[@]}; do
 	    pre=`echo $r1 | sed 's/_R1_trimmed.fastq.gz//'`
 	    r2=`echo $r1 | sed 's/_R1_/_R2_/'`
@@ -266,7 +257,7 @@ FastQC after trimming
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -281,7 +272,6 @@ FastQC after trimming
 	fqs=(`ls | grep '.fastq.gz'`)
 	
 	# run fastqc
-	#fq="BF10_S16_cont_removed_R1.fastq.gz"
 	for fq in ${fqs[@]}; do
 	    cmd="$fastqc $fq -o ${qc2_dir}"
 	    echo $cmd
@@ -309,7 +299,7 @@ Building Kaiju DB
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -325,9 +315,9 @@ Building Kaiju DB
 #	${kaiju_makedb} -s refseq
 #	mv ./*.dmp ./refseq
 
-	# nr_euk : Subset of NCBI BLAST nr database containing all proteins belonging to Archaea, Bacteria and Viruses + proteins from fungi and microbial eukaryotes
+	 nr_euk : Subset of NCBI BLAST nr database containing all proteins belonging to Archaea, Bacteria and Viruses + proteins from fungi and microbial eukaryotes
 	${kaiju_makedb} -s nr_euk
-#	mv ./*.dmp ./nr_euk
+	mv ./*.dmp ./nr_euk
 ```
 
 After setting up the local databases we then assigned the raw reads a taxonomy database.
@@ -342,7 +332,7 @@ Taxonomic Assingment using Kaiju
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -361,10 +351,8 @@ Taxonomic Assingment using Kaiju
 	
 	cd ${clean_dir}
 	r1s=(`ls | grep '_cont_removed_R1.fastq.gz$'`)
-#	r1s="BF11_S17_cont_removed_R1.fastq.gz"
 	
 	# run Kaiju
-	#r1="BF10_S16_cont_removed_R1.fastq.gz"
 	for r1 in ${r1s[@]}; do
 	    pre=`echo $r1 | sed 's/_cont_removed_R1.fastq.gz//'`
 	    r2=`echo $r1 | sed 's/_R1./_R2./'`
@@ -389,7 +377,7 @@ Kaiju data conversion to table and graph generation
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -442,10 +430,10 @@ The taxonomic abundances are more easily understood without the unclassifed read
 
 ## Assembly
 
-The assembly steps of the workflow involve using megahit to resolve the raw reads into contigs, metaquast to assess contig quality, 
+The assembly steps of the workflow involve using megahit to resolve the raw reads into contigs and metaquast to assess contig quality.
 
-A detailed version of the binning process can be seen here:
-![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/binning_procedure.png)
+A detailed version of the Assembly process can be seen here:
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/assembly_procedure.png)
 
 Initally the cleaned and trimmed files were unzipping in preparation for the binning procedure. 
 
@@ -458,7 +446,7 @@ Unzip files in preparation for binning
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -471,7 +459,6 @@ Unzip files in preparation for binning
 	fqs=(`ls | grep '.fastq.gz$'`)
 
 	# unzip files
-	#fq="BF10_S16_cont_removed_R1.fastq.gz"
 	for fq in ${fqs[@]}; do
 	    cmd="gunzip -k $fq"
 	    echo $cmd
@@ -490,7 +477,7 @@ Assembly using Megahit
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -505,7 +492,6 @@ Assembly using Megahit
 	megahit="/home4/sjeong6/tools/MEGAHIT-1.2.9-Linux-x86_64-static/bin/megahit"
 
 	# For co-assembly of samples within the same location(nre)
-	# column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
 
 	nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
 	nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
@@ -562,7 +548,7 @@ Contig Quality Check - all locations together
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -577,7 +563,6 @@ Contig Quality Check - all locations together
         # Tool
 	module add python
 	quast="/home4/sjeong6/tools/quast-5.2.0/quast.py"
-#	quast="/home4/sjeong6/miniconda3/pkgs/quast-5.0.2-py27pl5262h8eb80aa_5/bin/metaquast.py"
 
 	nre=("nre30" "nre70" "nre100" "nre180")
 	
@@ -599,7 +584,7 @@ Contig Quality Check - locations seperated
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -622,7 +607,6 @@ Contig Quality Check - locations seperated
         samtools="/opt/samtools/1.13/bin/samtools"
 
         # For co-assembly of samples within the same location(nre)
-        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
         
         nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
         nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
@@ -721,5 +705,398 @@ The metrics produced are best seen from when the locations are seperated as that
 
 ![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/assembly_qc_stats.png)
 
-## Binning
+## Metagenomic Binning
+
+The binning steps of the workflow involve using megabat2 resolve contigs into bins, jgi to assess bin depth, and checkm to assess the quality of the resolved bins. After the bins have been generated they were taxonomically assinged using GTDB-Tk.
+
+A detailed version of the Binning process can be seen here:
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/binning_procedure.png)
+
+The first step of the binning process is to bin the contigs themselves. This was done seperated by location to better assess the differences between before and after rather than between locations. 
+
+Binning Procedure using Metabat2
+```shell
+###################################################################################
+#	Binning for MAGs 
+###################################################################################
+
+        output="output2"
+
+        # Inputs
+        root="root"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+
+	clean_dir="${out_root}/clean_fastq"
+	unzip_dir="${clean_dir}/unzip"
+        assem_dir="${out_root}/assembly"
+        assemmap_dir="${assem_dir}/map_reads2assembly"
+	assembam_dir="${assemmap_dir}/bam"
+	
+	# Output
+	bin_dir="${out_root}/bin"
+        assemdepth_dir="${assem_dir}/depth"
+	binqc_dir="${bin_dir}/QC"
+	mkdir -p $assemdepth_dir $binqc_dir
+	
+        # Tool
+	metabat2="/home4/sjeong6/miniconda3/pkgs/metabat2-2.15-h137b6e9_0/bin/metabat2"
+	jgi_summarize_bam_contig_depths="/home4/sjeong6/miniconda3/pkgs/metabat2-2.15-h137b6e9_0/bin/jgi_summarize_bam_contig_depths"
+	checkm="/home4/sjeong6/miniconda3/pkgs/checkm-genome-1.0.12-py27_0/bin/checkm"
+
+        nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
+        nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
+        nre100=("N419_S23" "BF13_S19" "BF5_S11" "N599_S28" "BF17_S36" "BF9_S15" "N833_S33")
+        nre180=("N424_S24" "N425_S25" "BF14_S20" "BF6_S12" "N605_S29" "BF18_S37" "BF10_S16" "N839_S34")
+	
+	nres=("nre30" "nre70" "nre100" "nre180")
+
+	
+        # 1) Generate a depth file from BAM files to calculate abundance
+	# For 4 different NRE files, BAM files of 7 or 8 samples within the same NRE location together -> 4 depth.txt files
+	cd ${assembam_dir}
+	bam="_sorted_contigs.bam"
+
+	# concatenate the sample ID with bam filename(_sorted_contigs.bam)
+	nres30=( "${nre30[@]/%/${bam}}" )
+	nres70=( "${nre70[@]/%/${bam}}" )
+	nres100=( "${nre100[@]/%/${bam}}" )
+	nres180=( "${nre180[@]/%/${bam}}" )
+
+	# Run
+	# Ref : https://bitbucket.org/berkeleylab/metabat/wiki/Example_Large_Data
+	
+	cmd="${jgi_summarize_bam_contig_depths} ${nres30[*]} --outputDepth ${assemdepth_dir}/nre30_depth.txt --pairedContigs ${assemdepth_dir}/nre30_paired.txt --minContigLength 1000 --minContigDepth 2"
+	echo $cmd
+	eval $cmd
+
+	cmd="${jgi_summarize_bam_contig_depths} ${nres70[*]} --outputDepth ${assemdepth_dir}/nre70_depth.txt --pairedContigs ${assemdepth_dir}/nre70_paired.txt --minContigLength 1000 --minContigDepth 2"
+        echo $cmd
+        eval $cmd
+
+	cmd="${jgi_summarize_bam_contig_depths} ${nres100[*]} --outputDepth ${assemdepth_dir}/nre100_depth.txt --pairedContigs ${assemdepth_dir}/nre100_paired.txt --minContigLength 1000 --minContigDepth 2"
+        echo $cmd
+        eval $cmd
+
+	cmd="${jgi_summarize_bam_contig_depths} ${nres180[*]} --outputDepth ${assemdepth_dir}/nre180_depth.txt --pairedContigs ${assemdepth_dir}/nre180_paired.txt --minContigLength 1000 --minContigDepth 2"
+        echo $cmd
+        eval $cmd
+	
+	# 2) Bin contigs
+        # When assembly is poor quality or from highly complex community,
+        # this one has greatest number of large contigs.
+        # It appears that there are significant contaminations in terms of both strain level or above, so it is not advised to use lower minContig cutoff.
+        # (reference : https://bitbucket.org/berkeleylab/metabat/wiki/Best%20Binning%20Practices)
+
+	cd ${assem_dir}
+	nres=("nre30" "nre70" "nre100" "nre180")
+	#nre="nre30"
+	for nre in ${nres[@]}; do
+	    echo $nre
+	    cmd="${metabat2} -i ./${nre}/${nre}_assembled.contigs.fa -a ${assemdepth_dir}/${nre}_depth.txt -o ${bin_dir}/${nre} -v"
+	    echo $cmd
+	    eval $cmd
+	done
+```
+
+After the bins were successfully generated checkm was utilized to assess the quality and completness of those bins. 
+
+Quality check of bins with Checkm
+
+```shell
+###################################################################################
+#	Binn QC using CheckM
+##!!!!! Run after "conda activate checkm"
+###################################################################################
+
+        output="output2"
+
+        # Inputs
+        root="root"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+
+	clean_dir="${out_root}/clean_fastq"
+	unzip_dir="${clean_dir}/unzip"
+        assem_dir="${out_root}/assembly"
+        assemmap_dir="${assem_dir}/map_reads2assembly"
+	assembam_dir="${assemmap_dir}/bam"
+	
+	# Output
+	bin_dir="${out_root}/bin"
+        assemdepth_dir="/home4/sjeong6/Paerl/output2/test_checkm/depth"
+	binqc_dir="/home4/sjeong6/Paerl/output2/test_checkm/QC"
+	mkdir -p $assemdepth_dir $binqc_dir
+
+	# Bin QC using checkM
+	checkm data setRoot /home4/sjeong6/tools/checkm_DB
+	cmd="checkm lineage_wf -x fa ${bin_dir} ${binqc_dir} --tab_table -f ${binqc_dir}/MAGs_checkm.tab --reduced_tree "
+
+	echo $cmd
+	eval $cmd
+```
+
+Once the bins were assessed for quality they were taxonomically assigned using GTBD-TK, which output taxonomic composition for all of the bins. 
+
+```shell
+###################################################################################
+#	MAG taxonomic classification using GTDB-Tk
+###################################################################################
+
+        output="output2"
+
+        # Inputs
+        root="root"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+
+	clean_dir="${out_root}/clean_fastq"
+	unzip_dir="${clean_dir}/unzip"
+        assem_dir="${out_root}/assembly"
+        assemmap_dir="${assem_dir}/map_reads2assembly"
+	assembam_dir="${assemmap_dir}/bam"
+        bin_dir="${out_root}/bin"
+	
+	# Output
+	binclass_dir="${out_root}/bin_class"
+
+        # Tool
+	gtdbtk="/home4/sjeong6/miniconda3/envs/gtdbtk-2.1.1/bin/gtdbtk"
+
+	cd ${bin_dir}
+	cmd="${gtdbtk} classify_wf --extension fa --genome_dir ${bin_dir} --out_dir ${binclass_dir}"
+	echo $cmd
+	eval $cmd
+```
+
+This data was then resolved into relative abundance graphs using the R code. The section is broken up into two parts; one which maganges and extracts the data and the other which outputs the desired graph. 
+
+Data Managment and Extraction in R
+```R
+###########################################################################################################
+#       Stacked bar chart to show taxanomic diversity of bins
+###########################################################################################################
+
+	library(readr)
+	library(tidyverse)
+	library(ggplot2)
+	library(RColorBrewer)
+	library(colorRamps)
+	library(seqinr)
+	library(rlist)
+	library(gridExtra)
+	
+	# I/O
+	output <- "output2"
+	root <- "root"
+	dat_root <- file.path(root, "data")
+	out_root <- file.path(root, output)
+
+	assem_dir <- file.path(out_root, "assembly")
+	assemdepth_dir <- file.path(assem_dir, "depth")
+	bin_dir <- file.path(out_root, "bin")
+	binclass_dir <- file.path(out_root, "bin_class")
+	binclassify_dir <- file.path(binclass_dir, "classify")
+	
+	bintaxa_dir <- file.path(out_root, "bin_taxa")
+	taxaplot_dir <- file.path(bintaxa_dir, "taxa_plot")
+	if (!dir.exists(taxaplot_dir)) dir.create(taxaplot_dir)	
+
+        ##### Sample Info #####
+	# Import meta data
+	meta <- read.table(file.path(dat_root, "meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv"), sep=",", header=T)
+	colnames(meta) <- c("sampleID", "ng.uL", "ID", "NRE", "Date")
+
+        meta_grp <- meta %>% select("sampleID", "NRE", "Date")
+        meta_grp$NRE <- factor(meta_grp$NRE, levels=c("NRE30", "NRE70", "NRE100", "NRE180"))
+        meta_grp$Date <- as.Date(meta_grp$Date, "%m/%d/%Y") %>% factor(., ordered=T)
+
+	##### Contig depths from jgi_summarize_bam_contig_depths
+	nre30_depth <- read.delim(file.path(assemdepth_dir, "nre30_depth.txt"))
+	nre70_depth <- read.delim(file.path(assemdepth_dir, "nre70_depth.txt"))
+	nre100_depth <- read.delim(file.path(assemdepth_dir, "nre100_depth.txt"))
+	nre180_depth <- read.delim(file.path(assemdepth_dir, "nre180_depth.txt"))
+
+	depth_red <- function(x) {
+		  col1 <- c("contigName", "contigLen", "totalAvgDepth")
+		  col2 <- colnames(x)[grepl(".bam$",colnames(x))]
+		  x <- x[, c(col1, col2)]
+
+		  col2 <- col2 %>% gsub("_sorted_contigs.bam", "", .) %>% gsub("_S.*$", "", .)
+		  colnames(x) <- c(col1, col2)
+		  return(x)
+	}
+
+	nre30_depth_red <- depth_red(nre30_depth)
+	nre70_depth_red <- depth_red(nre70_depth)
+	nre100_depth_red <- depth_red(nre100_depth)
+	nre180_depth_red <- depth_red(nre180_depth)
+	
+
+	##### Bin taxa from GTDB-Tk
+	ar53_summary <- read.table(file.path(binclass_dir, "gtdbtk.ar53.summary.tsv"), sep = "\t", header = TRUE, stringsAsFactor = F)   # 12
+	bac120_summary <- read.table(file.path(binclass_dir, "gtdbtk.bac120.summary.tsv"), sep = "\t", header = TRUE, stringsAsFactor = F)   # 2453
+
+	bin_taxa <- rbind(bac120_summary, ar53_summary)   # 2465
+	
+	taxa.2use <- bin_taxa[,c("user_genome","classification", "closest_placement_taxonomy", "other_related_references.genome_id.species_name.radius.ANI.AF.")]
+	colnames(taxa.2use) <- c("bin", "classification", "closest_placement_taxonomy", "other_related_ref_species")
+	
+	levels <- c("domain", "phylum", "class", "order", "family", "genus", "species")
+	taxa <- matrix(NA, nrow(taxa.2use), length(levels))
+
+	for (i in 1:nrow(taxa.2use)) {
+	    x <- strsplit(taxa.2use[i,"classification"], ";")[[1]]
+	    if (length(x)==length(levels)) {
+	       taxa[i,] <- gsub("^.__", "", x) %>% gsub(" ", "_", .)
+	       taxa[i,][taxa[i,] == ""] <-"NA"
+	    } else {
+	      taxa[i,] <- rep(gsub(" ", "_", taxa.2use[i,"classification"]), length(levels))
+	    }	    
+	}
+	
+	colnames(taxa) <- levels
+	taxa.2use <- cbind(taxa.2use, taxa)
+
+	write.table(taxa.2use, file.path(bintaxa_dir, "bin_taxa.csv"), row.names = F, sep = ",", quote = F, col.names=T)
+
+	##### contigs in a bin
+	bin_fas <- list.files(bin_dir, pattern=".fa$", full.names=F)
+
+	contigs_in_bin <- NULL
+	for (fa in bin_fas) {
+	    bin <- sub(".fa$", "", fa)
+	    x <- read.fasta(file.path(bin_dir, fa))
+	    contigs <- as.array(names(x))
+	    df <- data.frame(bin=rep(bin, length(contigs)), contigName=contigs)
+	    contigs_in_bin <- rbind(contigs_in_bin, df)
+	}
+
+	outfile <- "contigs_in_bin.tab"
+	write.table(contigs_in_bin, file.path(bintaxa_dir, outfile), row.names = F, sep = "\t", quote = F, col.names=T)
+	
+	contigs_in_bin <- read.table(file.path(bintaxa_dir, "contigs_in_bin.tab"), header=T, sep="\t", stringsAsFactors=F, check.names=F)
+
+	nre30_contigs_in_bin <- contigs_in_bin[grep("^nre30", contigs_in_bin$bin),]
+	nre70_contigs_in_bin <- contigs_in_bin[grep("^nre70", contigs_in_bin$bin),]
+	nre100_contigs_in_bin <- contigs_in_bin[grep("^nre100", contigs_in_bin$bin),]
+	nre180_contigs_in_bin <- contigs_in_bin[grep("^nre180", contigs_in_bin$bin),]
+
+	# Merge the contigs_in_bin and depth_red
+	nre30_merged <- left_join(nre30_contigs_in_bin, nre30_depth_red, by="contigName")
+	nre70_merged <- left_join(nre70_contigs_in_bin, nre70_depth_red, by="contigName")
+	nre100_merged <- left_join(nre100_contigs_in_bin, nre100_depth_red, by="contigName")
+	nre180_merged <- left_join(nre180_contigs_in_bin, nre180_depth_red, by="contigName")
+
+	bins <- function(x,nre) factor(x$bin, levels=paste0(nre,".",1:length(unique(x$bin))))
+	bins30 <- bins(nre30_merged,"nre30")
+	bins70 <- bins(nre70_merged,"nre70")
+	bins100 <- bins(nre100_merged,"nre100")
+	bins180 <- bins(nre180_merged,"nre180")
+
+	nre30_bin_lst <- split(nre30_merged, f=bins30)
+	nre70_bin_lst <- split(nre70_merged, f=bins70)
+	nre100_bin_lst <- split(nre100_merged, f=bins100)
+	nre180_bin_lst <- split(nre180_merged, f=bins180)
+
+	len_weighted_avg <- function(x) {
+		cont.len <- as.matrix(t(x[,"contigLen"]))
+		cont.depth <- as.matrix(x[, !colnames(x) %in% c("bin", "contigName", "contigLen", "totalAvgDepth") ])
+		is.na(cont.depth) <- 0
+		avg <- cont.len %*% cont.depth
+		tot <- x[,"contigLen"] %>% sum
+		result <- data.frame(contigs.tot.len=tot, avg/tot)
+		return(result)
+	}
+
+	# len_weighted_avg(nre30_bin_lst[[1]])
+
+	nre30_bin_depth <- lapply(nre30_bin_lst, len_weighted_avg) %>% list.rbind %>% rownames_to_column("bin")
+	nre70_bin_depth <- lapply(nre70_bin_lst, len_weighted_avg) %>% list.rbind %>% rownames_to_column("bin")
+	nre100_bin_depth <- lapply(nre100_bin_lst, len_weighted_avg) %>% list.rbind %>% rownames_to_column("bin")
+	nre180_bin_depth <- lapply(nre180_bin_lst, len_weighted_avg) %>% list.rbind %>% rownames_to_column("bin")
+
+	nre30_summary <- merge(taxa.2use[grep("^nre30",taxa.2use$bin), c("bin", levels)], nre30_bin_depth, by="bin")
+	nre70_summary <- merge(taxa.2use[grep("^nre70",taxa.2use$bin), c("bin", levels)], nre70_bin_depth, by="bin")
+	nre100_summary <- merge(taxa.2use[grep("^nre100",taxa.2use$bin), c("bin", levels)], nre100_bin_depth, by="bin")
+	nre180_summary <- merge(taxa.2use[grep("^nre180",taxa.2use$bin), c("bin", levels)], nre180_bin_depth, by="bin")
+
+	nres_summary <- list(nre30=nre30_summary, nre70=nre70_summary, nre100=nre100_summary, nre180=nre180_summary)
+
+	write.table(nre30_summary, file.path(bintaxa_dir, "nre30_bin_taxa_abundance.csv"), row.names = F, sep = ",", quote = F, col.names=T)
+	write.table(nre70_summary, file.path(bintaxa_dir, "nre70_bin_taxa_abundance.csv"), row.names = F, sep = ",", quote = F, col.names=T)
+	write.table(nre100_summary, file.path(bintaxa_dir, "nre100_bin_taxa_abundance.csv"), row.names = F, sep = ",", quote = F, col.names=T)
+	write.table(nre180_summary, file.path(bintaxa_dir, "nre180_bin_taxa_abundance.csv"), row.names = F, sep = ",", quote = F, col.names=T)
+```
+
+Graphing Relative Abundances
+```R
+###########################################################################################################
+#       Stacked bar chart to show taxanomic diversity of bins
+###########################################################################################################
+
+	source("/tools/scripts2/4_5_1_MAG_taxa.R")
+        # set level among ("phylum", "class", "order", "family", "genus", "species")
+        # set num as the number of taxa that shown in plots
+#	level="domain" ; num=4    X
+#       level="phylum" ; num=15
+        level="class" ; num=15
+#       level="order" ; num=15
+#       level="family" ; num=15
+#       level="genus" ; num=20
+#       level="species" ; num=20
+
+	nres=c("nre30","nre70","nre100","nre180")
+
+	####################################################
+	# Export the stacked bar plot
+        filename <- paste0("bin_bar_", level, ".pdf")
+        pdf(file.path(taxaplot_dir, filename), width = 18, height = 12)
+	
+        stack_plot <- function(nre) {
+            nre_summary	<- nres_summary[[nre]]
+	    # 2) Excluding "unclassified" and cannot_be_assigned_to_a_(non-viral)_species, NA
+            z <- nre_summary %>% group_by_at(all_of(level)) %>% summarize_at(names(.)[!names(.) %in% c("bin", "contigs.tot.len", levels)], sum) %>%
+              arrange(-rowMeans(.[, names(.) != level]))
+	     
+            z1 <- z[1:(num),]
+            z2 <- z[(num+1):nrow(z),-1] %>% colSums(.)
+            z2 <- c("others", z2)
+            zz <- rbind(z1, z2)
+            zz[, names(zz)[names(zz)!=level]] <- sapply(zz[, names(zz)[names(zz)!=level]], as.numeric)
+
+            ww <- zz %>% as.data.frame
+            ww <- ww[!grepl('unclassified|cannot|NA', ww[,level]), ]
+
+            rel_w <- ww %>% mutate_at(names(.)[names(.) != level], function(x) 100 * x / sum(x)) # The column sum per sample = 100
+            colnames(rel_w)[1] <- "taxa"
+
+	    col.cnt <- length(rel_w$taxa)
+	    getPalette <- colorRampPalette(brewer.pal(n=12, "Set3"))
+            cols <- getPalette(col.cnt); names(cols) <- rel_w$taxa
+
+            rel_w %>% mutate_at("taxa", function(x) factor(x, levels = .[,"taxa"] %>% unlist %>% rev)) %>%
+                      pivot_longer(cols = names(.)[names(.) != "taxa"], names_to = "sampleID", values_to = "bin") %>%
+                      left_join(meta_grp[grep(toupper(nre), meta_grp$NRE),c("sampleID","Date")], by = "sampleID") %>%
+                      arrange(taxa, Date, desc(bin)) %>% mutate(sampleID = factor(sampleID, levels = .[.[,"taxa"] == "others", "sampleID"] %>% unlist %>% as.vector)) %>%
+                      ggplot(aes( x = sampleID, y = bin, fill = taxa)) + geom_col(position = "stack") +
+                                 ggtitle(paste0("Taxonomic distribution of bins of ", toupper(nre), " at ", level, " level_", "w/o NAs"))    +
+                                 xlab("Sample ID") + ylab("Proportion of bins (%)") + theme(legend.position = "right") +
+                                 scale_y_continuous(limits = c(-1, 101), expand = c(0,0)) + scale_fill_manual(values = cols)
+        }
+
+        p1 <- stack_plot("nre30");  p2 <- stack_plot("nre70");  p3 <- stack_plot("nre100");   p4 <- stack_plot("nre180")
+        grid.arrange(p1,p2,p3,p4, nrow = 2)
+	
+        dev.off()
+```
+
+The relative abundance chart output from the graphing R scripts can be seen here:
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/relativ_abun_bins_class.png)
+
+The relative abundances depticated in the graph above are at the class level as it provided the greatest resolution consitency and distiction between samples. For lower levels of classification please see the data located on the harddrive. 
+
+## Wrap Up
+
+Now that you have completed the workflow you should have beatiful graphs displaying the realtive abundances of the bins generated from the Metagenomic experiment of Hurricane Florence's affect on the North Carolinian coast. For questions regarding the workflow or troublehshooting please contact Jorden Rabasco (jrabasc@ncsu.edu) or Sangmi Jeong (sjeong6@ncsu.edu).
 
