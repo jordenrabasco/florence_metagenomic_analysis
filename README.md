@@ -26,7 +26,7 @@ This script sets up the work folders and directories needed in the downstream an
 #	set up folder structure
 ###################################################################################
 
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/output2"
 
@@ -42,13 +42,12 @@ This script sets up the work folders and directories needed in the downstream an
 	kdb_dir="kaiju_db"
 	pretaxa_dir="pre_taxa" # taxonomic assignment for reads 
 	assem_dir="assembly"   # using metahit
-#	assem2_dir="assembly2" # using metaSPAdes
 	bin_dir="bin"
 	binclass_dir="bin_class"
 	bintaxa_dir="bin_taxa"
 		
-#	mkdir -p $out_root && cd $out_root
-#	mkdir -p $log_dir $logstrim_dir $merge_dir $trim_dir $filter_dir $clean_dir $pool_dir $qc_dir $qc2_dir $kdb_dir $pretaxa_dir $assem_dir $assem2_dir $bin_dir $binclass_dir $bintaxa_dir
+	mkdir -p $out_root && cd $out_root
+	mkdir -p $log_dir $logstrim_dir $merge_dir $trim_dir $filter_dir $clean_dir $pool_dir $qc_dir $qc2_dir $kdb_dir $pretaxa_dir $assem_dir $assem2_dir $bin_dir $binclass_dir $bintaxa_dir
 
 
 	################# INSTALLATION #################
@@ -56,37 +55,32 @@ This script sets up the work folders and directories needed in the downstream an
 	cd ${tool_dir}
 
 	# metabat2
-#	conda install -c bioconda metabat2
-#	conda install -c bioconda/label/cf201901 metabat2
+	conda install -c bioconda metabat2
+	conda install -c bioconda/label/cf201901 metabat2
 
-	# spades
-#	wget http://cab.spbu.ru/files/release3.15.4/SPAdes-3.15.4-Linux.tar.gz
-#	tar -xzf SPAdes-3.15.4-Linux.tar.gz
-#	cd SPAdes-3.15.4-Linux/bin/
 
 	# for checkm
-#	conda create -n checkm python=2.7
-#	conda activate checkm
-#	conda install -c bioconda numpy matplotlib pysam
-#	conda install -c bioconda hmmer prodigal pplacer pysam
-	pip3 install checkm-genome
+	conda create -n checkm python=2.7
+	conda activate checkm
+	conda install -c bioconda numpy matplotlib pysam
+	conda install -c bioconda hmmer prodigal pplacer pysam
 
-	conda install -c bioconda checkm-genome
-#	mkdir -p ${tool_dir}/checkm_DB
-#	tar -xvzf checkm_data_2015_01_16.tar.gz -C "${tool_dir}/checkm_DB" --strip 1 > /dev/null
-#	checkm data setRoot "${tool_dir}/checkm_DB"
+
+	mkdir -p ${tool_dir}/checkm_DB
+	tar -xvzf checkm_data_2015_01_16.tar.gz -C "${tool_dir}/checkm_DB" --strip 1 > /dev/null
+	checkm data setRoot "${tool_dir}/checkm_DB"
 	export CHECKM_DATA_PATH=/home4/sjeong6/tools/checkm_DB
 	
 	# GTDB-Tk
-#        conda create -n gtdbtk-2.1.1 -c conda-forge -c bioconda gtdbtk=2.1.1
-#	conda activate gtdbtk-2.1.1
+        conda create -n gtdbtk-2.1.1 -c conda-forge -c bioconda gtdbtk=2.1.1
+	conda activate gtdbtk-2.1.1
 
 	cd $tool_dir
-#	wget https://data.gtdb.ecogenomic.org/releases/release207/207.0/auxillary_files/gtdbtk_r207_v2_data.tar.gz
-#	mkdir -p ${tool_dir}/gtdb_tk_DB
-#	tar -xvzf gtdbtk_r207_v2_data.tar.gz -C "/home4/sjeong6/tools/gtdb_tk_DB" --strip 1 > /dev/null
-#	rm gtdbtk_r207_v2_data.tar.gz
-#	conda env config vars set GTDBTK_DATA_PATH="/home4/sjeong6/tools/gtdb_tk_DB"
+	wget https://data.gtdb.ecogenomic.org/releases/release207/207.0/auxillary_files/gtdbtk_r207_v2_data.tar.gz
+	mkdir -p ${tool_dir}/gtdb_tk_DB
+	tar -xvzf gtdbtk_r207_v2_data.tar.gz -C "/home4/sjeong6/tools/gtdb_tk_DB" --strip 1 > /dev/null
+	rm gtdbtk_r207_v2_data.tar.gz
+	conda env config vars set GTDBTK_DATA_PATH="/home4/sjeong6/tools/gtdb_tk_DB"
 	
 	
 ```
@@ -104,7 +98,7 @@ FastQC Before Trimming
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -118,7 +112,6 @@ FastQC Before Trimming
 	fqs=(`ls | grep '.fastq.gz'`)
 
 	# run fastqc
-	#fq="BF10_S16_L001_R1_001.fastq.gz"
 	for fq in ${fqs[@]}; do
 	    cmd="$fastqc $fq -o ${qc_dir}"
 	    echo $cmd
@@ -143,7 +136,7 @@ Trimming via trimmomatic
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -158,7 +151,6 @@ Trimming via trimmomatic
 	r1s=(`ls | grep '_R1_001.fastq.gz$'`)
 
 	# run fastqc
-	#r1="BF10_S16_L001_R1_001.fastq.gz"
 	for r1 in ${r1s[@]}; do
 	    pre=`echo $r1 | sed 's/_L001_R1_001.fastq.gz//'`
 	    r2=`echo $r1 | sed 's/_R1_/_R2_/'`
@@ -191,7 +183,7 @@ Contaminant Analysis
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
         trim_dir="${out_root}/trim"
@@ -211,13 +203,12 @@ Contaminant Analysis
 	
 	# 1) Download GRCh38 db
 	cd ${filter_dir}
-#	wget https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
-#	unzip GRCh38_noalt_as.zip
+	wget https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
+	unzip GRCh38_noalt_as.zip
 	
 	cd ${trim_dir}
        	r1s=(`ls | grep '_R1_trimmed.fastq.gz$'`)
 
-	#r1="BF10_S16_R1_trimmed.fastq.gz"
 	for r1 in ${r1s[@]}; do
 	    pre=`echo $r1 | sed 's/_R1_trimmed.fastq.gz//'`
 	    r2=`echo $r1 | sed 's/_R1_/_R2_/'`
@@ -266,7 +257,7 @@ FastQC after trimming
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -281,7 +272,6 @@ FastQC after trimming
 	fqs=(`ls | grep '.fastq.gz'`)
 	
 	# run fastqc
-	#fq="BF10_S16_cont_removed_R1.fastq.gz"
 	for fq in ${fqs[@]}; do
 	    cmd="$fastqc $fq -o ${qc2_dir}"
 	    echo $cmd
@@ -309,7 +299,7 @@ Building Kaiju DB
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -325,9 +315,9 @@ Building Kaiju DB
 #	${kaiju_makedb} -s refseq
 #	mv ./*.dmp ./refseq
 
-	# nr_euk : Subset of NCBI BLAST nr database containing all proteins belonging to Archaea, Bacteria and Viruses + proteins from fungi and microbial eukaryotes
+	 nr_euk : Subset of NCBI BLAST nr database containing all proteins belonging to Archaea, Bacteria and Viruses + proteins from fungi and microbial eukaryotes
 	${kaiju_makedb} -s nr_euk
-#	mv ./*.dmp ./nr_euk
+	mv ./*.dmp ./nr_euk
 ```
 
 After setting up the local databases we then assigned the raw reads a taxonomy database.
@@ -342,7 +332,7 @@ Taxonomic Assingment using Kaiju
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -361,10 +351,8 @@ Taxonomic Assingment using Kaiju
 	
 	cd ${clean_dir}
 	r1s=(`ls | grep '_cont_removed_R1.fastq.gz$'`)
-#	r1s="BF11_S17_cont_removed_R1.fastq.gz"
 	
 	# run Kaiju
-	#r1="BF10_S16_cont_removed_R1.fastq.gz"
 	for r1 in ${r1s[@]}; do
 	    pre=`echo $r1 | sed 's/_cont_removed_R1.fastq.gz//'`
 	    r2=`echo $r1 | sed 's/_R1./_R2./'`
@@ -389,7 +377,7 @@ Kaiju data conversion to table and graph generation
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -458,7 +446,7 @@ Unzip files in preparation for binning
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 	clean_dir="${out_root}/clean_fastq"
@@ -471,7 +459,6 @@ Unzip files in preparation for binning
 	fqs=(`ls | grep '.fastq.gz$'`)
 
 	# unzip files
-	#fq="BF10_S16_cont_removed_R1.fastq.gz"
 	for fq in ${fqs[@]}; do
 	    cmd="gunzip -k $fq"
 	    echo $cmd
@@ -490,7 +477,7 @@ Assembly using Megahit
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -505,7 +492,6 @@ Assembly using Megahit
 	megahit="/home4/sjeong6/tools/MEGAHIT-1.2.9-Linux-x86_64-static/bin/megahit"
 
 	# For co-assembly of samples within the same location(nre)
-	# column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
 
 	nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
 	nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
@@ -562,7 +548,7 @@ Contig Quality Check - all locations together
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -577,7 +563,6 @@ Contig Quality Check - all locations together
         # Tool
 	module add python
 	quast="/home4/sjeong6/tools/quast-5.2.0/quast.py"
-#	quast="/home4/sjeong6/miniconda3/pkgs/quast-5.0.2-py27pl5262h8eb80aa_5/bin/metaquast.py"
 
 	nre=("nre30" "nre70" "nre100" "nre180")
 	
@@ -599,7 +584,7 @@ Contig Quality Check - locations seperated
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -622,7 +607,6 @@ Contig Quality Check - locations seperated
         samtools="/opt/samtools/1.13/bin/samtools"
 
         # For co-assembly of samples within the same location(nre)
-        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
         
         nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
         nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
@@ -739,7 +723,7 @@ Binning Procedure using Metabat2
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -760,7 +744,6 @@ Binning Procedure using Metabat2
 	jgi_summarize_bam_contig_depths="/home4/sjeong6/miniconda3/pkgs/metabat2-2.15-h137b6e9_0/bin/jgi_summarize_bam_contig_depths"
 	checkm="/home4/sjeong6/miniconda3/pkgs/checkm-genome-1.0.12-py27_0/bin/checkm"
 
-        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
         nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
         nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
         nre100=("N419_S23" "BF13_S19" "BF5_S11" "N599_S28" "BF17_S36" "BF9_S15" "N833_S33")
@@ -829,7 +812,7 @@ Quality check of bins with Checkm
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -844,26 +827,11 @@ Quality check of bins with Checkm
         assemdepth_dir="/home4/sjeong6/Paerl/output2/test_checkm/depth"
 	binqc_dir="/home4/sjeong6/Paerl/output2/test_checkm/QC"
 	mkdir -p $assemdepth_dir $binqc_dir
-	
-        # Tool
-	#checkm="/home4/sjeong6/miniconda3/envs/checkm/bin/checkm"
-#       checkm data setRoot /home4/sjeong6/tools/checkm_DB
-	#export CHECKM_DATA_PATH=/home4/sjeong6/tools/checkm_DB
-	
-        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
-        nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
-        nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
-        nre100=("N419_S23" "BF13_S19" "BF5_S11" "N599_S28" "BF17_S36" "BF9_S15" "N833_S33")
-        nre180=("N424_S24" "N425_S25" "BF14_S20" "BF6_S12" "N605_S29" "BF18_S37" "BF10_S16" "N839_S34")
-	
-	nres=("nre30" "nre70" "nre100" "nre180")
 
 	# Bin QC using checkM
+	checkm data setRoot /home4/sjeong6/tools/checkm_DB
 	cmd="checkm lineage_wf -x fa ${bin_dir} ${binqc_dir} --tab_table -f ${binqc_dir}/MAGs_checkm.tab --reduced_tree "
 
-
-	#cmd="checkm lineage_wf -g -x fna -e 1e-10 -l 0.7 -f ${binqc_dir}/MAGs_checkm.tab --tab_table --reduced_tree ${bin_dir} ${binqc_dir}"
-#	cmd="${checkm} lineage_wf -x fa ${bin_dir} ${binqc_dir} --tab_table -f ${binqc_dir}/MAGs_checkm.tab --reduced_tree"
 	echo $cmd
 	eval $cmd
 ```
@@ -878,7 +846,7 @@ Once the bins were assessed for quality they were taxonomically assigned using G
         output="output2"
 
         # Inputs
-        root="/home4/sjeong6/Paerl"
+        root="root"
         dat_root="${root}/data"
         out_root="${root}/${output}"
 
@@ -892,17 +860,8 @@ Once the bins were assessed for quality they were taxonomically assigned using G
 	# Output
 	binclass_dir="${out_root}/bin_class"
 
-	
         # Tool
 	gtdbtk="/home4/sjeong6/miniconda3/envs/gtdbtk-2.1.1/bin/gtdbtk"
-
-        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
-        nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
-        nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
-        nre100=("N419_S23" "BF13_S19" "BF5_S11" "N599_S28" "BF17_S36" "BF9_S15" "N833_S33")
-        nre180=("N424_S24" "N425_S25" "BF14_S20" "BF6_S12" "N605_S29" "BF18_S37" "BF10_S16" "N839_S34")
-	
-	nres=("nre30" "nre70" "nre100" "nre180")
 
 	cd ${bin_dir}
 	cmd="${gtdbtk} classify_wf --extension fa --genome_dir ${bin_dir} --out_dir ${binclass_dir}"
