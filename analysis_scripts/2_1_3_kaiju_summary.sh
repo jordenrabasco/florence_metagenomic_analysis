@@ -38,7 +38,6 @@
 	# B. Specific level  => Create stacked bars using 2_1_5_taxa_summary.R
 
 	levels=("phylum", "class", "order", "family", "genus")   # "species" is the same with the above run for ALL taxa levels
-#	levels=("phylum")
 
 	for level in ${levels[@]}; do
 	    cmd="${kaiju2table} -t ${kdb_dir}/${db}/nodes.dmp -n ${kdb_dir}/${db}/names.dmp -r ${level} ${outs[*]} \

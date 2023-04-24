@@ -26,8 +26,8 @@
         kaiju_makedb="/home4/sjeong6/tools/kaiju/bin/kaiju-makedb"
 	
 	cd ${clean_dir}
-#	r1s=(`ls | grep '_cont_removed_R1.fastq.gz$'`)
-	r1s="BF11_S17_cont_removed_R1.fastq.gz"
+	r1s=(`ls | grep '_cont_removed_R1.fastq.gz$'`)
+#	r1s="BF11_S17_cont_removed_R1.fastq.gz"
 	
 	# run Kaiju
 	#r1="BF10_S16_cont_removed_R1.fastq.gz"

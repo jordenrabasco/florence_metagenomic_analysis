@@ -45,8 +45,8 @@
 	#nre="nre30"
 	for nre in ${nres[@]}; do
 	    cmd="${bowtie2_build} ./${nre}/${nre}${fa} ${assemdb_dir}/${nre}"
-#	    echo $cmd
-#	    eval $cmd
+	    echo $cmd
+	    eval $cmd
 	done
 	
 	# 2) Map input reads to assembly
@@ -58,32 +58,32 @@
         for samp in ${nre30[@]}; do
             cmd="${bowtie2} --sensitive-local -x ${assemdb_dir}/nre30 \
                             -1 ${samp}${r1} -2 ${samp}${r2} --no-unal -p 4 -S ${assemmap_dir}/${samp}.sam 2> ${assemmap_dir}/${samp}_aligned2nre30.log"
-#            echo $cmd
-#            eval $cmd
+            echo $cmd
+            eval $cmd
         done
     
         # NRE70
         for samp in ${nre70[@]}; do
             cmd="${bowtie2} --sensitive-local -x ${assemdb_dir}/nre70 \
                             -1 ${samp}${r1} -2 ${samp}${r2} --no-unal -p 4 -S ${assemmap_dir}/${samp}.sam 2> ${assemmap_dir}/${samp}_aligned2nre70.log"
-#            echo $cmd
-#            eval $cmd
+            echo $cmd
+            eval $cmd
         done
 
         # NRE100
         for samp in ${nre100[@]}; do
             cmd="${bowtie2} --sensitive-local -x ${assemdb_dir}/nre100 \
                             -1 ${samp}${r1} -2 ${samp}${r2} --no-unal -p 4 -S ${assemmap_dir}/${samp}.sam 2> ${assemmap_dir}/${samp}_aligned2nre100.log"
-#            echo $cmd
-#            eval $cmd
+            echo $cmd
+            eval $cmd
         done
 
         # NRE180
         for samp in ${nre180[@]}; do
             cmd="${bowtie2} --sensitive-local -x ${assemdb_dir}/nre180 \
                             -1 ${samp}${r1} -2 ${samp}${r2} --no-unal -p 4 -S ${assemmap_dir}/${samp}.sam 2> ${assemmap_dir}/${samp}_aligned2nre180.log"
-#            echo $cmd
-#            eval $cmd
+            echo $cmd
+            eval $cmd
         done
 
 	# SAM to BAM index
@@ -93,23 +93,23 @@
 	#sam="BF10_S16.sam"
         for sam in ${sams[@]}; do
 	    pre=`echo $sam | sed 's/.sam//'`
-#	    echo ${sam}
-#	    echo ${pre}
+	    echo ${sam}
+	    echo ${pre}
 	    
             # 3) Convert SAM to BAM file
 	    cmd1="${samtools} view ${sam} -b -o ${assembam_dir}/${pre}_assembled_contigs.bam"
-#            echo $cmd1
-#            eval $cmd1
+            echo $cmd1
+            eval $cmd1
 	    
 	    # 4) Sort BAM file
 	    cmd2="${samtools} sort -@ 10 ${assembam_dir}/${pre}_assembled_contigs.bam -o ${assembam_dir}/${pre}_sorted_contigs.bam"
-#	    echo $cmd2
-#	    eval $cmd2
+	    echo $cmd2
+	    eval $cmd2
 	    
 	    # 5) Index BAM file
 	    cmd3="${samtools} index ${assembam_dir}/${pre}_sorted_contigs.bam"
-#	    echo $cmd3
-#	    eval $cmd3
+	    echo $cmd3
+	    eval $cmd3
         done
 
 	# 6) Generate assembly stats
@@ -120,7 +120,7 @@
 	for bam in ${bams[@]}; do
 	    pre=`echo $bam | sed 's/_sorted_contigs.bam//'`
 	    cmd="${samtools} idxstats ${bam} > ${assemstat_dir}/${pre}_idxstats.txt"
-#	    echo $cmd
-#	    eval $cmd
+	    echo $cmd
+	    eval $cmd
 	done
 
