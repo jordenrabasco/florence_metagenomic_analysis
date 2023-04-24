@@ -442,10 +442,10 @@ The taxonomic abundances are more easily understood without the unclassifed read
 
 ## Assembly
 
-The assembly steps of the workflow involve using megahit to resolve the raw reads into contigs, metaquast to assess contig quality, 
+The assembly steps of the workflow involve using megahit to resolve the raw reads into contigs and metaquast to assess contig quality.
 
-A detailed version of the binning process can be seen here:
-![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/binning_procedure.png)
+A detailed version of the Assembly process can be seen here:
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/assembly_procedure.png)
 
 Initally the cleaned and trimmed files were unzipping in preparation for the binning procedure. 
 
@@ -721,5 +721,201 @@ The metrics produced are best seen from when the locations are seperated as that
 
 ![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/assembly_qc_stats.png)
 
-## Binning
+## Metagenomic Binning
+
+The binning steps of the workflow involve using megabat2 resolve contigs into bins, jgi to assess bin depth, and checkm to assess the quality of the resolved bins. After the bins have been generated they were taxonomically assinged using GTDB-Tk.
+
+A detailed version of the Binning process can be seen here:
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/binning_procedure.png)
+
+The first step of the binning process is to bin the contigs themselves. This was done seperated by location to better assess the differences between before and after rather than between locations. 
+
+Binning Procedure using Metabat2
+```shell
+###################################################################################
+#	Binning for MAGs 
+###################################################################################
+
+        output="output2"
+
+        # Inputs
+        root="/home4/sjeong6/Paerl"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+
+	clean_dir="${out_root}/clean_fastq"
+	unzip_dir="${clean_dir}/unzip"
+        assem_dir="${out_root}/assembly"
+        assemmap_dir="${assem_dir}/map_reads2assembly"
+	assembam_dir="${assemmap_dir}/bam"
+	
+	# Output
+	bin_dir="${out_root}/bin"
+        assemdepth_dir="${assem_dir}/depth"
+	binqc_dir="${bin_dir}/QC"
+	mkdir -p $assemdepth_dir $binqc_dir
+	
+        # Tool
+	metabat2="/home4/sjeong6/miniconda3/pkgs/metabat2-2.15-h137b6e9_0/bin/metabat2"
+	jgi_summarize_bam_contig_depths="/home4/sjeong6/miniconda3/pkgs/metabat2-2.15-h137b6e9_0/bin/jgi_summarize_bam_contig_depths"
+	checkm="/home4/sjeong6/miniconda3/pkgs/checkm-genome-1.0.12-py27_0/bin/checkm"
+
+        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
+        nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
+        nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
+        nre100=("N419_S23" "BF13_S19" "BF5_S11" "N599_S28" "BF17_S36" "BF9_S15" "N833_S33")
+        nre180=("N424_S24" "N425_S25" "BF14_S20" "BF6_S12" "N605_S29" "BF18_S37" "BF10_S16" "N839_S34")
+	
+	nres=("nre30" "nre70" "nre100" "nre180")
+
+	
+        # 1) Generate a depth file from BAM files to calculate abundance
+	# For 4 different NRE files, BAM files of 7 or 8 samples within the same NRE location together -> 4 depth.txt files
+	cd ${assembam_dir}
+	bam="_sorted_contigs.bam"
+
+	# concatenate the sample ID with bam filename(_sorted_contigs.bam)
+	nres30=( "${nre30[@]/%/${bam}}" )
+	nres70=( "${nre70[@]/%/${bam}}" )
+	nres100=( "${nre100[@]/%/${bam}}" )
+	nres180=( "${nre180[@]/%/${bam}}" )
+
+	# Run
+	# Ref : https://bitbucket.org/berkeleylab/metabat/wiki/Example_Large_Data
+	
+	cmd="${jgi_summarize_bam_contig_depths} ${nres30[*]} --outputDepth ${assemdepth_dir}/nre30_depth.txt --pairedContigs ${assemdepth_dir}/nre30_paired.txt --minContigLength 1000 --minContigDepth 2"
+	echo $cmd
+	eval $cmd
+
+	cmd="${jgi_summarize_bam_contig_depths} ${nres70[*]} --outputDepth ${assemdepth_dir}/nre70_depth.txt --pairedContigs ${assemdepth_dir}/nre70_paired.txt --minContigLength 1000 --minContigDepth 2"
+        echo $cmd
+        eval $cmd
+
+	cmd="${jgi_summarize_bam_contig_depths} ${nres100[*]} --outputDepth ${assemdepth_dir}/nre100_depth.txt --pairedContigs ${assemdepth_dir}/nre100_paired.txt --minContigLength 1000 --minContigDepth 2"
+        echo $cmd
+        eval $cmd
+
+	cmd="${jgi_summarize_bam_contig_depths} ${nres180[*]} --outputDepth ${assemdepth_dir}/nre180_depth.txt --pairedContigs ${assemdepth_dir}/nre180_paired.txt --minContigLength 1000 --minContigDepth 2"
+        echo $cmd
+        eval $cmd
+	
+	# 2) Bin contigs
+        # When assembly is poor quality or from highly complex community,
+        # this one has greatest number of large contigs.
+        # It appears that there are significant contaminations in terms of both strain level or above, so it is not advised to use lower minContig cutoff.
+        # (reference : https://bitbucket.org/berkeleylab/metabat/wiki/Best%20Binning%20Practices)
+
+	cd ${assem_dir}
+	nres=("nre30" "nre70" "nre100" "nre180")
+	#nre="nre30"
+	for nre in ${nres[@]}; do
+	    echo $nre
+	    cmd="${metabat2} -i ./${nre}/${nre}_assembled.contigs.fa -a ${assemdepth_dir}/${nre}_depth.txt -o ${bin_dir}/${nre} -v"
+	    echo $cmd
+	    eval $cmd
+	done
+```
+
+After the bins were successfully generated checkm was utilized to assess the quality and completness of those bins. 
+
+Quality check of bins with Checkm
+
+```shell
+###################################################################################
+#	Binn QC using CheckM
+##!!!!! Run after "conda activate checkm"
+###################################################################################
+
+        output="output2"
+
+        # Inputs
+        root="/home4/sjeong6/Paerl"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+
+	clean_dir="${out_root}/clean_fastq"
+	unzip_dir="${clean_dir}/unzip"
+        assem_dir="${out_root}/assembly"
+        assemmap_dir="${assem_dir}/map_reads2assembly"
+	assembam_dir="${assemmap_dir}/bam"
+	
+	# Output
+	bin_dir="${out_root}/bin"
+        assemdepth_dir="/home4/sjeong6/Paerl/output2/test_checkm/depth"
+	binqc_dir="/home4/sjeong6/Paerl/output2/test_checkm/QC"
+	mkdir -p $assemdepth_dir $binqc_dir
+	
+        # Tool
+	#checkm="/home4/sjeong6/miniconda3/envs/checkm/bin/checkm"
+#       checkm data setRoot /home4/sjeong6/tools/checkm_DB
+	#export CHECKM_DATA_PATH=/home4/sjeong6/tools/checkm_DB
+	
+        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
+        nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
+        nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
+        nre100=("N419_S23" "BF13_S19" "BF5_S11" "N599_S28" "BF17_S36" "BF9_S15" "N833_S33")
+        nre180=("N424_S24" "N425_S25" "BF14_S20" "BF6_S12" "N605_S29" "BF18_S37" "BF10_S16" "N839_S34")
+	
+	nres=("nre30" "nre70" "nre100" "nre180")
+
+	# Bin QC using checkM
+	cmd="checkm lineage_wf -x fa ${bin_dir} ${binqc_dir} --tab_table -f ${binqc_dir}/MAGs_checkm.tab --reduced_tree "
+
+
+	#cmd="checkm lineage_wf -g -x fna -e 1e-10 -l 0.7 -f ${binqc_dir}/MAGs_checkm.tab --tab_table --reduced_tree ${bin_dir} ${binqc_dir}"
+#	cmd="${checkm} lineage_wf -x fa ${bin_dir} ${binqc_dir} --tab_table -f ${binqc_dir}/MAGs_checkm.tab --reduced_tree"
+	echo $cmd
+	eval $cmd
+```
+
+Once the bins were assessed for quality they were taxonomically assigned using GTBD-TK, which output taxonomic assingments for all of the bins. This data was then resolved using R code which is included in the scripts folder. 
+
+```shell
+###################################################################################
+#	MAG taxonomic classification using GTDB-Tk
+###################################################################################
+
+        output="output2"
+
+        # Inputs
+        root="/home4/sjeong6/Paerl"
+        dat_root="${root}/data"
+        out_root="${root}/${output}"
+
+	clean_dir="${out_root}/clean_fastq"
+	unzip_dir="${clean_dir}/unzip"
+        assem_dir="${out_root}/assembly"
+        assemmap_dir="${assem_dir}/map_reads2assembly"
+	assembam_dir="${assemmap_dir}/bam"
+        bin_dir="${out_root}/bin"
+	
+	# Output
+	binclass_dir="${out_root}/bin_class"
+
+	
+        # Tool
+	gtdbtk="/home4/sjeong6/miniconda3/envs/gtdbtk-2.1.1/bin/gtdbtk"
+
+        # column -s, -t < ${dat_root}/meta/NGS_WorkOrder_NRE_MetaG_12_2_21_JS_Sample_Names.csv # | less -#2 -N -S
+        nre30=("N411_S21" "BF11_S17" "BF3_S9" "N591_S26" "BF15_S35" "BF7_S13" "N824_S31")
+        nre70=("N416_S22" "BF12_S18" "BF4_S10" "N596_S27" "N613_S30" "BF8_S14" "N830_S32")
+        nre100=("N419_S23" "BF13_S19" "BF5_S11" "N599_S28" "BF17_S36" "BF9_S15" "N833_S33")
+        nre180=("N424_S24" "N425_S25" "BF14_S20" "BF6_S12" "N605_S29" "BF18_S37" "BF10_S16" "N839_S34")
+	
+	nres=("nre30" "nre70" "nre100" "nre180")
+
+	cd ${bin_dir}
+	cmd="${gtdbtk} classify_wf --extension fa --genome_dir ${bin_dir} --out_dir ${binclass_dir}"
+	echo $cmd
+	eval $cmd
+```
+
+The output of the graphing R scripts can be seen here:
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/relativ_abun_bins_class.png)
+
+The relative abundances depticated in the graph above are at the class level as it provided the greatest resolution consitency and distiction between samples. For lower levels of classification please see the data located on the harddrive. 
+
+## Wrap Up
+
+Now that you have completed the workflow you should have beatiful graphs displaying the realtive abundances of the bins generated from the Metagenomic experiment of Hurricane Florence's affect on the North Carolinian coast. For questions regarding the workflow or troublehshooting please contact Jorden Rabasco (jrabasc@ncsu.edu) or Sangmi Jeong (sjeong6@ncsu.edu).
 
