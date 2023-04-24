@@ -1,5 +1,5 @@
 # Florence_Metagenomic_Analysis
-In the analysis documented below we analyzed shotgun sequencing data sampled from various locations before and after the landfall of hurricane florence. The sequencing data was quality controlled and taxonomically analyzed to detect taxonomic shifts, in a local estuary, produced by Florence's landfall and the subsequence ecological perturbation that followed. A detailed summary of the goals of this analysis can be found in the included Plan of Work document. 
+In the analysis documented below we analyzed shotgun sequencing data sampled from various locations after the landfall of hurricane florence. The sequencing data was quality controlled and taxonomically analyzed to detect taxonomic shifts, in a local estuary, produced by Florence's landfall and the subsequence ecological perturbation that followed. A detailed summary of the goals of this analysis can be found in the included Plan of Work document. 
 
 This markdown is intented as an analysis summary and sample workflow from which our procedure can be replicated. The aforementioned procedure is broken up into various steps seperated out in different bash scripts to emphasize each step in the process. The scripts are intended to be run sequentially in the order in which they are presented.
 
