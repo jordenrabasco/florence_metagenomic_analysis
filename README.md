@@ -823,20 +823,24 @@ Quality check of bins with Checkm
 	assembam_dir="${assemmap_dir}/bam"
 	
 	# Output
-	bin_dir="${out_root}/bin"
-        assemdepth_dir="/home4/sjeong6/Paerl/output2/test_checkm/depth"
-	binqc_dir="/home4/sjeong6/Paerl/output2/test_checkm/QC"
+	bin_dir="${out_root}/bin/nre100_bins"
+        assemdepth_dir="/home4/sjeong6/Paerl/output2/checkm_nre100/depth"
+	binqc_dir="/home4/sjeong6/Paerl/output2/checkm_nre100/QC"
 	mkdir -p $assemdepth_dir $binqc_dir
-
-	# Bin QC using checkM
+	
+        # Tool
 	checkm data setRoot /home4/sjeong6/tools/checkm_DB
+	
+	# Bin QC using checkM
 	cmd="checkm lineage_wf -x fa ${bin_dir} ${binqc_dir} --tab_table -f ${binqc_dir}/MAGs_checkm.tab --reduced_tree "
 
 	echo $cmd
 	eval $cmd
 ```
 
-Once the bins were assessed for quality they were taxonomically assigned using GTBD-TK, which output taxonomic composition for all of the bins. 
+Once the bins were assessed for quality they were taxonomically assigned using GTBD-TK, which output taxonomic composition for all of the bins. The bin quality metrics of completeness and contamiantion were resolved into barplots which can be seen here:
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/bin_completness.png)
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/bin_contamination.png)
 
 ```shell
 ###################################################################################
@@ -1092,7 +1096,7 @@ Graphing Relative Abundances
 ```
 
 The relative abundance chart output from the graphing R scripts can be seen here:
-![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/relativ_abun_bins_class.png)
+![alt text](https://github.com/jordenrabasco/florence_metagenomic_analysis/blob/main/analysis_support_docs/analysis_images/bin_taxonomic_abundances.png)
 
 The relative abundances depticated in the graph above are at the class level as it provided the greatest resolution consitency and distiction between samples. For lower levels of classification please see the data located on the harddrive. 
 
